@@ -37,7 +37,7 @@
     }
     
     /* Layout */
-    #views { flex: 1; position: relative; overflow: hidden; padding-top: env(safe-area-inset-top); }
+    #views { flex: 1; position: relative; overflow: hidden; padding-top: calc(env(safe-area-inset-top) + 20px); }
     .view {
       position: absolute; top:0; left:0; width:100%; height:100%;
       overflow-y: auto; overflow-x: hidden;
@@ -47,7 +47,7 @@
     .view.active { opacity: 1; pointer-events: auto; z-index: 10; }
     
     /* Header */
-    header { padding: 10px 20px 20px; display: flex; justify-content: space-between; align-items: flex-end; }
+    header { padding: 20px 20px 20px; display: flex; justify-content: space-between; align-items: flex-end; }
     h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; color: var(--tx1); }
     .lang-toggle { background: rgba(255,255,255,0.1); border: none; color: var(--ac); padding: 6px 12px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 
@@ -61,10 +61,10 @@
     .scroll-row::-webkit-scrollbar { display: none; }
     
     /* Horizontal Cards */
-    .card { flex: 0 0 160px; scroll-snap-align: start; cursor: pointer; }
-    .card img { width: 160px; height: 160px; border-radius: 16px; object-fit: cover; background: var(--c3); box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; }
-    .card .title { font-weight: 700; font-size: 15px; color: var(--tx1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
-    .card .sub { font-size: 13px; color: var(--tx3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .card { flex: 0 0 110px; scroll-snap-align: start; cursor: pointer; }
+    .card img { width: 110px; height: 110px; border-radius: 12px; object-fit: cover; background: var(--c3); box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; }
+    .card .title { font-weight: 700; font-size: 14px; color: var(--tx1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
+    .card .sub { font-size: 12px; color: var(--tx3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* Home Tiles (dense) */
     .section-title { margin: 10px 20px 5px; font-size: 22px; font-weight: 700; color: var(--tx1); letter-spacing: -0.3px; display: flex; justify-content: space-between; align-items: flex-end;}
@@ -181,22 +181,22 @@
       </div>
       <div class="scroll-row">
         <div class="card" onclick="openPodcastSearch('The Ranveer Show')">
-          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/6b/c4/83/6bc483ac-9588-4903-888a-ea35aed8fe24/mza_10332822156828555811.jpg/316x316bb.webp">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/6b/c4/83/6bc483ac-9588-4903-888a-ea35aed8fe24/mza_10332822156828555811.jpg/316x316bb.jpg" onerror="this.src='https://via.placeholder.com/150'">
           <div class="title">The Ranveer Show</div>
           <div class="sub">BeerBiceps</div>
         </div>
         <div class="card" onclick="openPodcastSearch('WTF is with Nikhil Kamath')">
-          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/0d/3e/dc/0d3edcfa-af58-f947-f018-8fc99a5e42f6/mza_13337968508008802870.jpeg/316x316bb.webp">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/0d/3e/dc/0d3edcfa-af58-f947-f018-8fc99a5e42f6/mza_13337968508008802870.jpg/316x316bb.jpg" onerror="this.src='https://via.placeholder.com/150'">
           <div class="title">WTF is with Nikhil</div>
           <div class="sub">Nikhil Kamath</div>
         </div>
         <div class="card" onclick="openPodcastSearch('Finshots Daily')">
-          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/05/cc/c3/05ccc313-0951-93de-b230-ce4221de4ec2/mza_14234057869680373062.jpg/316x316bb.webp">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/05/cc/c3/05ccc313-0951-93de-b230-ce4221de4ec2/mza_14234057869680373062.jpg/316x316bb.jpg" onerror="this.src='https://via.placeholder.com/150'">
           <div class="title">Finshots Daily</div>
           <div class="sub">Finshots</div>
         </div>
         <div class="card" onclick="openPodcastSearch('The Stories of Mahabharata')">
-          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts125/v4/37/fe/a2/37fea221-5a00-1ad7-cd18-4905eff786dc/mza_7218962294155160893.jpg/316x316bb.webp">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts125/v4/37/fe/a2/37fea221-5a00-1ad7-cd18-4905eff786dc/mza_7218962294155160893.jpg/316x316bb.jpg" onerror="this.src='https://via.placeholder.com/150'">
           <div class="title">Mahabharata</div>
           <div class="sub">Sudipta Bhawmik</div>
         </div>
