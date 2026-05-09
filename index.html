@@ -466,7 +466,7 @@
       if(!ep) return;
       S.currEp = ep;
       AUD.src = ep.audioUrl;
-      AUD.play();
+      AUD.play().catch(e => showToast("Playback error"));
       document.getElementById('mini-player').classList.add('show');
       
       const uiUpdate = (pre) => {
@@ -476,6 +476,25 @@
         document.getElementById(pre+'-sub').innerText = ep.podcast;
       };
       uiUpdate('mini'); uiUpdate('fp');
+
+      // Apple Lock Screen / Control Center Integration
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: ep.title,
+          artist: ep.podcast,
+          album: 'DesiCast',
+          artwork: [
+            { src: ep.thumb, sizes: '96x96', type: 'image/jpeg' },
+            { src: ep.thumb, sizes: '256x256', type: 'image/jpeg' },
+            { src: ep.thumb, sizes: '512x512', type: 'image/jpeg' }
+          ]
+        });
+
+        navigator.mediaSession.setActionHandler('play', () => AUD.play());
+        navigator.mediaSession.setActionHandler('pause', () => AUD.pause());
+        navigator.mediaSession.setActionHandler('seekforward', () => skip(15));
+        navigator.mediaSession.setActionHandler('seekbackward', () => skip(-15));
+      }
     }
     function togglePlay() { if(S.playing) AUD.pause(); else AUD.play(); }
     function updatePlayUI() {
