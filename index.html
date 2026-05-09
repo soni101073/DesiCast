@@ -30,7 +30,8 @@
       color: var(--tx1);
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100dvh;
+      width: 100vw;
       overflow: hidden;
       -webkit-tap-highlight-color: transparent;
       -webkit-font-smoothing: antialiased;
@@ -47,9 +48,18 @@
     .view.active { opacity: 1; pointer-events: auto; z-index: 10; }
     
     /* Header */
-    header { padding: 20px 20px 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-    h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; color: var(--tx1); }
-    .lang-toggle { background: rgba(255,255,255,0.1); border: none; color: var(--ac); padding: 6px 12px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    h1 { 
+      font-size: 28px; 
+      font-weight: 900; 
+      letter-spacing: -1px; 
+      margin: 0;
+      background: linear-gradient(135deg, #ff9933 0%, #ffffff 50%, #138808 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(255,153,51,0.2);
+    }
+    .lang-toggle { background: rgba(255,255,255,0.1); border: none; color: var(--tx1); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 
     /* Chips & Horizontal Scroll */
     .chips-wrapper { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -61,10 +71,10 @@
     .scroll-row::-webkit-scrollbar { display: none; }
     
     /* Horizontal Cards */
-    .card { flex: 0 0 110px; scroll-snap-align: start; cursor: pointer; }
-    .card img { width: 110px; height: 110px; border-radius: 12px; object-fit: cover; background: var(--c3); box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; }
-    .card .title { font-weight: 700; font-size: 14px; color: var(--tx1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
-    .card .sub { font-size: 12px; color: var(--tx3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .card { flex: 0 0 80px; scroll-snap-align: start; cursor: pointer; text-align: center; }
+    .card img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; background: var(--c3); box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: 2px solid var(--ac); margin-bottom: 6px; }
+    .card .title { font-weight: 600; font-size: 11px; color: var(--tx1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
+    .card .sub { display: none; }
 
     /* Home Tiles (dense) */
     .section-title { margin: 10px 20px 5px; font-size: 22px; font-weight: 700; color: var(--tx1); letter-spacing: -0.3px; display: flex; justify-content: space-between; align-items: flex-end;}
@@ -202,29 +212,48 @@
         </div>
       </div>
 
-      <div class="section-title">Live Radio & Streams</div>
-      <div class="grid">
+      <div class="section-title">Add Source</div>
+      <div style="padding: 10px 20px 20px;">
+        <button class="btn-create" style="margin:0; width:100%;" onclick="loadCustomRSS()">+ Paste RSS Link</button>
+      </div>
+    </div>
+
+    <!-- Radio -->
+    <div id="view-radio" class="view">
+      <header><h1>Radio</h1></header>
+      <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 20px;">
         <div class="tile" onclick="playLiveRadio('Vividh Bharati', 'https://air.pc.cdn.bitgravity.com/air/live/pbaudio001/chunklist.m3u8', 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/All_India_Radio_Logo.svg/300px-All_India_Radio_Logo.svg.png')">
           <div class="tile-bg" style="background: linear-gradient(to bottom right, #ff9933, #138808);"></div>
           <span>Vividh Bharati</span>
         </div>
-        <div class="tile" onclick="playLiveRadio('FM Gold', 'https://air.pc.cdn.bitgravity.com/air/live/pbaudio002/chunklist.m3u8', 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/All_India_Radio_Logo.svg/300px-All_India_Radio_Logo.svg.png')">
+        <div class="tile" onclick="playLiveRadio('AIR FM Gold', 'https://air.pc.cdn.bitgravity.com/air/live/pbaudio002/chunklist.m3u8', 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/All_India_Radio_Logo.svg/300px-All_India_Radio_Logo.svg.png')">
           <div class="tile-bg" style="background: linear-gradient(to bottom right, #f12711, #f5af19);"></div>
           <span>AIR FM Gold</span>
+        </div>
+        <div class="tile" onclick="playLiveRadio('AIR FM Rainbow', 'https://air.pc.cdn.bitgravity.com/air/live/pbaudio003/chunklist.m3u8', 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/All_India_Radio_Logo.svg/300px-All_India_Radio_Logo.svg.png')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #fc4a1a, #f7b733);"></div>
+          <span>FM Rainbow</span>
         </div>
         <div class="tile" onclick="playLiveRadio('Radio Mirchi Top 20', 'https://stream.zeno.fm/f3wvbbqmdg8uv', 'https://logos-download.com/wp-content/uploads/2021/01/Radio_Mirchi_Logo.png')">
           <div class="tile-bg" style="background: linear-gradient(to bottom right, #e52d27, #b31217);"></div>
           <span>Mirchi Top 20</span>
         </div>
-        <div class="tile" onclick="playLiveRadio('Lofi Girl', 'https://play.streamafrica.net/lofi/stream', 'https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Lofi_girl_logo.png/300px-Lofi_girl_logo.png')">
-          <div class="tile-bg" style="background: linear-gradient(to bottom right, #8E2DE2, #4A00E0);"></div>
-          <span>Lofi Girl</span>
+        <div class="tile" onclick="playLiveRadio('NDTV Tune India', 'https://ndtvstream.ndtv.com/audio/tuneindia.m3u8', 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/NDTV_logo.svg/300px-NDTV_logo.svg.png')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #000000, #434343);"></div>
+          <span>NDTV India</span>
         </div>
-      </div>
-
-      <div class="section-title">Add Source</div>
-      <div style="padding: 10px 20px 20px;">
-        <button class="btn-create" style="margin:0; width:100%;" onclick="loadCustomRSS()">+ Paste RSS Link</button>
+        <div class="tile" onclick="playLiveRadio('Hindi Retro Hits', 'https://stream.zeno.fm/1f4p1fqq12quv', '')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #8E2DE2, #4A00E0);"></div>
+          <span>Retro Hits</span>
+        </div>
+        <div class="tile" onclick="playLiveRadio('Desi Bollywood', 'https://stream.zeno.fm/v90dfaavw5quv', '')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #ff00cc, #333399);"></div>
+          <span>Bollywood</span>
+        </div>
+        <div class="tile" onclick="playLiveRadio('Bhakti Radio', 'https://stream.zeno.fm/3uq6rwrn12quv', '')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #f2709c, #ff9472);"></div>
+          <span>Bhakti Radio</span>
+        </div>
       </div>
     </div>
 
@@ -278,6 +307,10 @@
     <div class="tab" onclick="switchTab('search')">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       Search
+    </div>
+    <div class="tab" onclick="switchTab('radio')">
+      <svg viewBox="0 0 24 24"><path d="M3.24 6.15C2.51 6.43 2 7.17 2 8v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8c0-.83-.51-1.57-1.24-1.85L17.43 2.06c-.34-.4-1-.44-1.4-.1s-.44 1-.1 1.4l2.5 3.03H5.56l2.5-3.03c.34-.4.3-1-.1-1.4s-1-.34-1.4.1L3.24 6.15zM7 20c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-8h-2v-2h-2v2H4V8h16v4z"/></svg>
+      Radio
     </div>
     <div class="tab" onclick="switchTab('library')">
       <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
