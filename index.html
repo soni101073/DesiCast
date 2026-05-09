@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DesiCast - Indian Podcast Player</title>
+  <style>
+    :root {
+      --bg: #000;
+      --c1: #111;
+      --c2: #1a1a1a;
+      --c3: #2a2a2a;
+      --ac: #ff6b35; /* Orange/Saffron */
+      --ac2: #138808; /* Green */
+      --tx1: #fff;
+      --tx2: #ccc;
+      --tx3: #777;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--tx1);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Layout */
+    #views { flex: 1; position: relative; overflow: hidden; }
+    .view {
+      position: absolute; top:0; left:0; width:100%; height:100%;
+      overflow-y: auto; overflow-x: hidden;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      padding-bottom: 20px;
+    }
+    .view.active { opacity: 1; pointer-events: auto; z-index: 10; }
+    
+    /* Header */
+    header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, var(--ac), var(--ac2)); -webkit-background-clip: text; color: transparent; }
+    .lang-toggle { background: var(--c2); border: 1px solid var(--c3); color: var(--tx1); padding: 5px 10px; border-radius: 15px; font-size: 14px; cursor: pointer; }
+
+    /* Home Tiles */
+    .section-title { margin: 10px 20px; font-size: 18px; font-weight: 600; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px 20px; }
+    .tile { 
+      background: var(--c2); border-radius: 12px; padding: 15px; 
+      display: flex; flex-direction: column; justify-content: flex-end;
+      height: 100px; color: #fff; font-weight: bold; cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    .tile:active { transform: scale(0.98); }
+    .tile-bg { position: absolute; inset:0; opacity:0.8; }
+    .tile span { position: relative; z-index: 2; font-size: 15px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+    /* Search */
+    .search-box { margin: 10px 20px; }
+    .search-input { width: 100%; padding: 15px; border-radius: 12px; background: var(--c2); border: 1px solid var(--c3); color: var(--tx1); font-size: 16px; outline: none; }
+    .search-input:focus { border-color: var(--ac); }
+    #search-results { padding: 10px 20px; }
+    
+    /* List Items */
+    .list-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; cursor: pointer; }
+    .list-item img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; background: var(--c3); }
+    .list-item .info { flex: 1; overflow: hidden; }
+    .list-item .title { font-weight: 600; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .list-item .sub { font-size: 13px; color: var(--tx2); }
+    
+    /* Podcast Detail */
+    #podcast-detail { background: var(--bg); position: absolute; inset: 0; z-index: 20; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s; padding-bottom: 80px; }
+    #podcast-detail.show { transform: translateX(0); }
+    .pd-header { padding: 40px 20px 20px; text-align: center; }
+    .pd-header img { width: 150px; height: 150px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+    .pd-title { font-size: 22px; font-weight: bold; margin-bottom: 5px; }
+    .pd-author { color: var(--tx2); font-size: 15px; margin-bottom: 15px; }
+    .pd-desc { font-size: 14px; color: var(--tx2); line-height: 1.4; text-align: left; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .close-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2); width: 36px; height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border:none; color:#fff;}
+    
+    /* Library */
+    .btn-create { display: block; width: calc(100% - 40px); margin: 20px; padding: 15px; background: var(--c2); border: 1px dashed var(--tx3); color: var(--tx1); border-radius: 12px; font-size: 16px; cursor: pointer; }
+    
+    /* Tabs */
+    #tabs { display: flex; background: var(--c1); border-top: 1px solid var(--c3); padding-bottom: env(safe-area-inset-bottom); z-index: 100;}
+    .tab { flex: 1; padding: 15px 0; text-align: center; color: var(--tx3); cursor: pointer; font-size: 12px; font-weight: 500; display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .tab.active { color: var(--tx1); }
+    .tab svg { width: 24px; height: 24px; fill: currentColor; }
+
+    /* Mini Player */
+    #mini-player { background: var(--c2); border-top: 1px solid var(--c3); padding: 10px 15px; display: flex; align-items: center; gap: 12px; display: none; cursor: pointer; z-index:100; }
+    #mini-player.show { display: flex; }
+    #mini-img { width: 40px; height: 40px; border-radius: 6px; background: var(--c3); object-fit: cover;}
+    .mini-info { flex: 1; overflow: hidden; }
+    #mini-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #mini-sub { font-size: 12px; color: var(--tx2); }
+    .mini-btn { background: none; border: none; color: #fff; padding: 10px; cursor: pointer; }
+    
+    /* Full Player */
+    #full-player { position: fixed; inset: 0; background: var(--bg); z-index: 200; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; }
+    #full-player.show { transform: translateY(0); }
+    .fp-top { display: flex; justify-content: space-between; padding: 20px; align-items: center;}
+    .fp-art-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 40px; }
+    #fp-art { width: 100%; aspect-ratio: 1; max-width: 350px; border-radius: 12px; object-fit: cover; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .fp-info { padding: 30px 30px 10px; }
+    #fp-title { font-size: 22px; font-weight: bold; margin-bottom: 8px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+    #fp-sub { font-size: 16px; color: var(--ac); }
+    
+    /* Progress */
+    .progress-container { padding: 0 30px; margin: 20px 0; }
+    #progress-bar { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; background: var(--c3); border-radius: 2px; outline: none; }
+    #progress-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; cursor: pointer; }
+    .time-info { display: flex; justify-content: space-between; font-size: 12px; color: var(--tx2); margin-top: 8px; font-variant-numeric: tabular-nums; }
+    
+    /* Controls */
+    .controls { display: flex; justify-content: center; align-items: center; gap: 30px; padding: 10px 0 40px; }
+    .ctrl-btn { background: none; border: none; color: var(--tx1); cursor: pointer; display:flex; align-items:center; justify-content:center;}
+    .ctrl-play { width: 64px; height: 64px; border-radius: 50%; background: #fff; color: #000; }
+    .speed-btn { background: var(--c3); border: none; color: #fff; border-radius: 15px; padding: 5px 10px; font-size: 12px; font-weight:bold; }
+    
+    /* Toast */
+    #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--ac); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight:600; opacity: 0; transition: all 0.3s; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* Loader */
+    .loader { border: 3px solid var(--c3); border-top: 3px solid var(--ac); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 40px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Views -->
+  <div id="views">
+    <!-- Home -->
+    <div id="view-home" class="view active">
+      <header>
+        <h1>DesiCast 🇮🇳</h1>
+        <button class="lang-toggle" onclick="toggleLang()">Eng/Hin</button>
+      </header>
+      <div class="section-title">Quick Play</div>
+      <div class="grid">
+        <div class="tile" onclick="openPodcastSearch('The Ranveer Show')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #833ab4, #fd1d1d);"></div>
+          <span>Ranveer Show</span>
+        </div>
+        <div class="tile" onclick="openPodcastSearch('Aaj Tak Radio')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #cb2d3e, #ef473a);"></div>
+          <span>Aaj Tak</span>
+        </div>
+        <div class="tile" onclick="openPodcastSearch('Sadhguru podcast')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #2193b0, #6dd5ed);"></div>
+          <span>Sadhguru</span>
+        </div>
+        <div class="tile" onclick="openPodcastSearch('Honestly by Tanmay Bhat')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #11998e, #38ef7d);"></div>
+          <span>Tanmay Bhat</span>
+        </div>
+        <div class="tile" onclick="openPodcastSearch('Diary of a CEO')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #f12711, #f5af19);"></div>
+          <span>Diary of CEO</span>
+        </div>
+        <div class="tile" onclick="openPodcastSearch('Crime Kahaniyan Hindi')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #8E2DE2, #4A00E0);"></div>
+          <span>Crime Kahaniya</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div id="view-search" class="view">
+      <header><h1>Search</h1></header>
+      <div class="search-box">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search podcasts..." oninput="debounceSearch()">
+      </div>
+      <div id="search-results"></div>
+    </div>
+
+    <!-- Library -->
+    <div id="view-library" class="view">
+      <header><h1>Library</h1></header>
+      <button class="btn-create" onclick="createFolder()">+ Create Folder</button>
+      <div id="folder-list"></div>
+    </div>
+
+    <!-- Podcast Detail (Overlay inside Views) -->
+    <div id="podcast-detail">
+      <button class="close-btn" onclick="closeDetails()">✕</button>
+      <div class="pd-header">
+        <img id="pd-img" src="">
+        <div class="pd-title" id="pd-title">Title</div>
+        <div class="pd-author" id="pd-author">Author</div>
+        <div class="pd-desc" id="pd-desc"></div>
+      </div>
+      <div id="pd-episodes" style="padding: 0 20px;"></div>
+    </div>
+  </div>
+
+  <!-- Mini Player -->
+  <div id="mini-player" onclick="openPlayer()">
+    <img id="mini-img" src="">
+    <div class="mini-info">
+      <div id="mini-title">Title</div>
+      <div id="mini-sub">Podcast</div>
+    </div>
+    <button class="mini-btn" onclick="event.stopPropagation(); togglePlay()">
+      <svg id="mini-play-icon" width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div id="tabs">
+    <div class="tab active" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Home
+    </div>
+    <div class="tab" onclick="switchTab('search')">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      Search
+    </div>
+    <div class="tab" onclick="switchTab('library')">
+      <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+      Library
+    </div>
+  </div>
+
+  <!-- Full Player -->
+  <div id="full-player">
+    <div class="fp-top">
+      <button class="close-btn" style="position:relative;top:0;left:0;background:none;" onclick="closePlayer()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+      </button>
+      <button class="speed-btn" onclick="toggleSpeed()" id="speed-btn">1x</button>
+      <button class="close-btn" style="position:relative;top:0;left:0;background:none;color:var(--tx2)" onclick="saveCurrentEpisode()">♡</button>
+    </div>
+    <div class="fp-art-container"><img id="fp-art" src=""></div>
+    <div class="fp-info">
+      <div id="fp-title">Episode Title</div>
+      <div id="fp-sub">Podcast Name</div>
+    </div>
+    <div class="progress-container">
+      <input type="range" id="progress-bar" value="0" step="1" oninput="seekAudio()">
+      <div class="time-info">
+        <span id="time-curr">0:00</span>
+        <span id="time-tot">-:--</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" onclick="skip(-15)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M11 5.9L9.6 7.3l2.8 2.8-5.1.1c-2.4 0-4.3 1.9-4.3 4.3v4.5h2v-4.5c0-1.3 1.1-2.3 2.3-2.3l5 .1-2.8 2.8L11 16.5l5.3-5.3L11 5.9z"/></svg>
+      </button>
+      <button class="ctrl-btn ctrl-play" onclick="togglePlay()">
+        <svg id="fp-play-icon" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="ctrl-btn" onclick="skip(15)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M13 5.9l1.4 1.4-2.8 2.8 5.1.1c2.4 0 4.3 1.9 4.3 4.3v4.5h-2v-4.5c0-1.3-1.1-2.3-2.3-2.3l-5 .1 2.8 2.8L13 16.5l-5.3-5.3L13 5.9z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const S = {
+      lang: 'en', currEp: null, playing: false, eps: [], speed: 1, 
+      timer: null
+    };
+
+    const AUD = new Audio();
+    AUD.addEventListener('timeupdate', updateProgress);
+    AUD.addEventListener('loadedmetadata', () => { document.getElementById('progress-bar').max = AUD.duration; updateProgress(); });
+    AUD.addEventListener('play', () => { S.playing = true; updatePlayUI(); });
+    AUD.addEventListener('pause', () => { S.playing = false; updatePlayUI(); });
+    AUD.addEventListener('ended', () => S.playing = false);
+    AUD.addEventListener('error', () => showToast("Error playing audio"));
+
+    // Tabs
+    function switchTab(id) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('view-'+id).classList.add('active');
+      if(id === 'library') renderLibrary();
+    }
+
+    function toggleLang() {
+      S.lang = S.lang === 'en' ? 'hi' : 'en';
+      showToast(S.lang === 'hi' ? "Hindi selected" : "English selected");
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // Search
+    function debounceSearch() {
+      clearTimeout(S.timer);
+      S.timer = setTimeout(doSearch, 500);
+    }
+    async function doSearch(query) {
+      const el = document.getElementById('search-results');
+      const q = query || document.getElementById('searchInput').value;
+      if(!q) { el.innerHTML = ''; return; }
+      el.innerHTML = '<div class="loader"></div>';
+      try {
+        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&country=IN&media=podcast&limit=20`);
+        const json = await res.json();
+        el.innerHTML = '';
+        if(!json.results.length) el.innerHTML = '<div style="text-align:center;color:var(--tx2);margin-top:20px;">No results found.</div>';
+        json.results.forEach(p => {
+          el.innerHTML += `
+            <div class="list-item" onclick='loadPodcast(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
+              <img src="${p.artworkUrl100 || p.artworkUrl600}">
+              <div class="info">
+                <div class="title">${p.collectionName}</div>
+                <div class="sub">${p.artistName}</div>
+              </div>
+            </div>`;
+        });
+      } catch(e) { el.innerHTML = '<div style="color:red">Search failed</div>'; }
+    }
+    function openPodcastSearch(q) {
+      document.getElementById('searchInput').value = q;
+      switchTab('search');
+      document.querySelectorAll('.tab')[1].classList.add('active');
+      document.querySelectorAll('.tab')[0].classList.remove('active');
+      doSearch(q);
+    }
+
+    // Podcast Detail
+    const CORS_PROXIES = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
+    async function loadPodcast(p) {
+      const detail = document.getElementById('podcast-detail');
+      detail.classList.add('show');
+      document.getElementById('pd-img').src = p.artworkUrl600;
+      document.getElementById('pd-title').innerText = p.collectionName;
+      document.getElementById('pd-author').innerText = p.artistName;
+      document.getElementById('pd-desc').innerText = '';
+      const epsEl = document.getElementById('pd-episodes');
+      epsEl.innerHTML = '<div class="loader"></div>';
+
+      try {
+        let xmlText = null;
+        for(let proxy of CORS_PROXIES) {
+          try {
+            const res = await fetch(proxy + encodeURIComponent(p.feedUrl));
+            if(res.ok) { xmlText = await res.text(); break; }
+          } catch(e) {}
+        }
+        if(!xmlText) throw new Error("Could not fetch feed");
+        
+        const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
+        const descMatch = xml.querySelector('channel > description');
+        if(descMatch) document.getElementById('pd-desc').innerText = descMatch.textContent;
+
+        const items = xml.querySelectorAll('item');
+        S.eps = []; epsEl.innerHTML = '';
+        items.forEach((item, i) => {
+          const title = item.querySelector('title')?.textContent || 'Unknown Episode';
+          const enclosure = item.querySelector('enclosure');
+          const url = enclosure?.getAttribute('url');
+          if(!url) return;
+          const image = item.querySelector('itunes\\:image')?.getAttribute('href') || p.artworkUrl600;
+          const date = new Date(item.querySelector('pubDate')?.textContent || Date.now()).toLocaleDateString();
+          const ep = { id: p.collectionId+'_'+i, title, podcast: p.collectionName, audioUrl: url, thumb: image, date };
+          S.eps.push(ep);
+          
+          epsEl.innerHTML += `
+            <div class="list-item" onclick='playEp(${JSON.stringify(ep).replace(/'/g, "&apos;")})'>
+              <img src="${image}" style="width:50px;height:50px;border-radius:6px;">
+              <div class="info">
+                <div class="title" style="font-size:14px;white-space:normal;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${title}</div>
+                <div class="sub">${date}</div>
+              </div>
+            </div>`;
+        });
+      } catch(e) { epsEl.innerHTML = '<div style="color:red">Failed to load feed</div>'; }
+    }
+    function closeDetails() { document.getElementById('podcast-detail').classList.remove('show'); }
+
+    // Playback
+    function playEp(ep) {
+      if(!ep) return;
+      S.currEp = ep;
+      AUD.src = ep.audioUrl;
+      AUD.play();
+      document.getElementById('mini-player').classList.add('show');
+      
+      const uiUpdate = (pre) => {
+        document.getElementById(pre+'-img').src = ep.thumb;
+        if(document.getElementById(pre+'-art')) document.getElementById(pre+'-art').src = ep.thumb;
+        document.getElementById(pre+'-title').innerText = ep.title;
+        document.getElementById(pre+'-sub').innerText = ep.podcast;
+      };
+      uiUpdate('mini'); uiUpdate('fp');
+    }
+    function togglePlay() { if(S.playing) AUD.pause(); else AUD.play(); }
+    function updatePlayUI() {
+      const path = S.playing ? 'M6 19h4V5H6v14zm8-14v14h4V5h-4z' : 'M8 5v14l11-7z';
+      document.getElementById('mini-play-icon').innerHTML = `<path d="${path}"/>`;
+      document.getElementById('fp-play-icon').innerHTML = `<path d="${path}"/>`;
+    }
+    function skip(sec) { AUD.currentTime += sec; }
+    function formatTime(s) {
+      if(isNaN(s)) return '0:00';
+      const m = Math.floor(s/60);
+      return m + ':' + Math.floor(s%60).toString().padStart(2, '0');
+    }
+    function updateProgress() {
+      document.getElementById('progress-bar').value = AUD.currentTime || 0;
+      document.getElementById('time-curr').innerText = formatTime(AUD.currentTime);
+      document.getElementById('time-tot').innerText = formatTime(AUD.duration);
+    }
+    function seekAudio() { AUD.currentTime = document.getElementById('progress-bar').value; }
+    function toggleSpeed() {
+      const speeds = [1, 1.25, 1.5, 2, 0.5];
+      S.speed = speeds[(speeds.indexOf(S.speed)+1)%speeds.length];
+      AUD.playbackRate = S.speed;
+      document.getElementById('speed-btn').innerText = S.speed + 'x';
+      showToast(S.speed + 'x Speed');
+    }
+    
+    // Player Full
+    function openPlayer() { document.getElementById('full-player').classList.add('show'); }
+    function closePlayer() { document.getElementById('full-player').classList.remove('show'); }
+
+    // Library
+    let folders = JSON.parse(localStorage.getItem('DC_FOLDERS')) || { 'Favorites': [] };
+    function saveState() { localStorage.setItem('DC_FOLDERS', JSON.stringify(folders)); }
+    function renderLibrary() {
+      const el = document.getElementById('folder-list');
+      el.innerHTML = '';
+      for(let f in folders) {
+        el.innerHTML += `
+          <div class="list-item" style="padding:0 20px;">
+            <div style="width:50px;height:50px;background:var(--c2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;">📁</div>
+            <div class="info">
+              <div class="title">${f}</div>
+              <div class="sub">${folders[f].length} episodes</div>
+            </div>
+            ${f !== 'Favorites' ? `<button onclick="deleteFolder('${f}')" style="background:none;border:none;color:var(--tx3);font-size:20px;">×</button>` : ''}
+          </div>`;
+          // Tapping folder can be added
+      }
+    }
+    function createFolder() {
+      const n = prompt("Folder Name:");
+      if(n && !folders[n]) { folders[n] = []; saveState(); renderLibrary(); }
+    }
+    function deleteFolder(n) {
+      if(confirm(`Delete folder ${n}?`)) { delete folders[n]; saveState(); renderLibrary(); }
+    }
+    function saveCurrentEpisode() {
+      if(!S.currEp) return;
+      if(!folders['Favorites'].find(e => e.id === S.currEp.id)) {
+        folders['Favorites'].push(S.currEp);
+        saveState();
+        showToast("Saved to Favorites");
+      } else {
+        showToast("Already saved");
+      }
+    }
+  </script>
+</body>
+</html>
