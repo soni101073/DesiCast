@@ -51,15 +51,31 @@
     h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.5px; color: var(--tx1); }
     .lang-toggle { background: rgba(255,255,255,0.1); border: none; color: var(--ac); padding: 6px 12px; border-radius: 20px; font-size: 15px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 
-    /* Home Tiles */
-    .section-title { margin: 10px 20px; font-size: 22px; font-weight: 700; color: var(--tx1); letter-spacing: -0.3px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 10px 20px; }
+    /* Chips & Horizontal Scroll */
+    .chips-wrapper { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .chips-wrapper::-webkit-scrollbar { display: none; }
+    .chip { flex-shrink: 0; padding: 8px 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); color: var(--tx1); border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; scroll-snap-align: start; }
+    .chip:active { background: rgba(255,255,255,0.2); }
+    
+    .scroll-row { display: flex; gap: 16px; overflow-x: auto; padding: 10px 20px 20px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .scroll-row::-webkit-scrollbar { display: none; }
+    
+    /* Horizontal Cards */
+    .card { flex: 0 0 160px; scroll-snap-align: start; cursor: pointer; }
+    .card img { width: 160px; height: 160px; border-radius: 16px; object-fit: cover; background: var(--c3); box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; }
+    .card .title { font-weight: 700; font-size: 15px; color: var(--tx1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 2px; }
+    .card .sub { font-size: 13px; color: var(--tx3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Home Tiles (dense) */
+    .section-title { margin: 10px 20px 5px; font-size: 22px; font-weight: 700; color: var(--tx1); letter-spacing: -0.3px; display: flex; justify-content: space-between; align-items: flex-end;}
+    .section-title .see-all { font-size: 14px; font-weight: 600; color: var(--ac); cursor: pointer; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 20px; }
     .tile { 
-      background: var(--c2); border-radius: 16px; padding: 16px; 
+      background: var(--c2); border-radius: 14px; padding: 16px; 
       display: flex; flex-direction: column; justify-content: flex-end;
-      height: 120px; color: #fff; font-weight: 700; cursor: pointer;
+      height: 90px; color: #fff; font-weight: 700; cursor: pointer;
       position: relative; overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     .tile:active { transform: scale(0.96); transition: transform 0.1s; }
     .tile-bg { position: absolute; inset:0; opacity:0.85; transition: opacity 0.3s; }
@@ -147,35 +163,68 @@
     <!-- Home -->
     <div id="view-home" class="view active">
       <header>
-        <h1>DesiCast 🇮🇳</h1>
+        <h1>DesiCast</h1>
         <button class="lang-toggle" onclick="toggleLang()">Eng/Hin</button>
       </header>
-      <div class="section-title">Quick Play</div>
+
+      <div class="chips-wrapper">
+        <button class="chip" onclick="openPodcastSearch('News India')">News</button>
+        <button class="chip" onclick="openPodcastSearch('Comedy Hindi')">Comedy</button>
+        <button class="chip" onclick="openPodcastSearch('Business India')">Business</button>
+        <button class="chip" onclick="openPodcastSearch('Spirituality')">Spirituality</button>
+        <button class="chip" onclick="openPodcastSearch('True Crime India')">Crime</button>
+      </div>
+
+      <div class="section-title">
+        <span>Trending</span>
+        <span class="see-all" onclick="switchTab('search')">Search</span>
+      </div>
+      <div class="scroll-row">
+        <div class="card" onclick="openPodcastSearch('The Ranveer Show')">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts126/v4/6b/c4/83/6bc483ac-9588-4903-888a-ea35aed8fe24/mza_10332822156828555811.jpg/316x316bb.webp">
+          <div class="title">The Ranveer Show</div>
+          <div class="sub">BeerBiceps</div>
+        </div>
+        <div class="card" onclick="openPodcastSearch('WTF is with Nikhil Kamath')">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/0d/3e/dc/0d3edcfa-af58-f947-f018-8fc99a5e42f6/mza_13337968508008802870.jpeg/316x316bb.webp">
+          <div class="title">WTF is with Nikhil</div>
+          <div class="sub">Nikhil Kamath</div>
+        </div>
+        <div class="card" onclick="openPodcastSearch('Finshots Daily')">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/05/cc/c3/05ccc313-0951-93de-b230-ce4221de4ec2/mza_14234057869680373062.jpg/316x316bb.webp">
+          <div class="title">Finshots Daily</div>
+          <div class="sub">Finshots</div>
+        </div>
+        <div class="card" onclick="openPodcastSearch('The Stories of Mahabharata')">
+          <img src="https://is1-ssl.mzstatic.com/image/thumb/Podcasts125/v4/37/fe/a2/37fea221-5a00-1ad7-cd18-4905eff786dc/mza_7218962294155160893.jpg/316x316bb.webp">
+          <div class="title">Mahabharata</div>
+          <div class="sub">Sudipta Bhawmik</div>
+        </div>
+      </div>
+
+      <div class="section-title">Live Radio & Streams</div>
       <div class="grid">
-        <div class="tile" onclick="openPodcastSearch('The Ranveer Show')">
-          <div class="tile-bg" style="background: linear-gradient(to bottom right, #833ab4, #fd1d1d);"></div>
-          <span>Ranveer Show</span>
+        <div class="tile" onclick="playLiveRadio('Vividh Bharati', 'https://air.pc.cdn.bitgravity.com/air/live/pbaudio001/chunklist.m3u8', 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/All_India_Radio_Logo.svg/300px-All_India_Radio_Logo.svg.png')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #ff9933, #138808);"></div>
+          <span>Vividh Bharati</span>
         </div>
-        <div class="tile" onclick="openPodcastSearch('Aaj Tak Radio')">
-          <div class="tile-bg" style="background: linear-gradient(to bottom right, #cb2d3e, #ef473a);"></div>
-          <span>Aaj Tak</span>
-        </div>
-        <div class="tile" onclick="openPodcastSearch('Sadhguru podcast')">
-          <div class="tile-bg" style="background: linear-gradient(to bottom right, #2193b0, #6dd5ed);"></div>
-          <span>Sadhguru</span>
-        </div>
-        <div class="tile" onclick="openPodcastSearch('Honestly by Tanmay Bhat')">
-          <div class="tile-bg" style="background: linear-gradient(to bottom right, #11998e, #38ef7d);"></div>
-          <span>Tanmay Bhat</span>
-        </div>
-        <div class="tile" onclick="openPodcastSearch('Diary of a CEO')">
+        <div class="tile" onclick="playLiveRadio('FM Gold', 'https://air.pc.cdn.bitgravity.com/air/live/pbaudio002/chunklist.m3u8', 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f6/All_India_Radio_Logo.svg/300px-All_India_Radio_Logo.svg.png')">
           <div class="tile-bg" style="background: linear-gradient(to bottom right, #f12711, #f5af19);"></div>
-          <span>Diary of CEO</span>
+          <span>AIR FM Gold</span>
         </div>
-        <div class="tile" onclick="openPodcastSearch('Crime Kahaniyan Hindi')">
+        <div class="tile" onclick="playLiveRadio('Radio Mirchi Top 20', 'https://stream.zeno.fm/f3wvbbqmdg8uv', 'https://logos-download.com/wp-content/uploads/2021/01/Radio_Mirchi_Logo.png')">
+          <div class="tile-bg" style="background: linear-gradient(to bottom right, #e52d27, #b31217);"></div>
+          <span>Mirchi Top 20</span>
+        </div>
+        <div class="tile" onclick="playLiveRadio('Lofi Girl', 'https://play.streamafrica.net/lofi/stream', 'https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Lofi_girl_logo.png/300px-Lofi_girl_logo.png')">
           <div class="tile-bg" style="background: linear-gradient(to bottom right, #8E2DE2, #4A00E0);"></div>
-          <span>Crime Kahaniya</span>
+          <span>Lofi Girl</span>
         </div>
+      </div>
+
+      <div class="section-title">Add Source</div>
+      <div style="padding: 10px 20px 20px;">
+        <button class="btn-create" style="margin:0; width:100%;" onclick="loadCustomRSS()">+ Paste RSS Link</button>
       </div>
     </div>
 
@@ -347,7 +396,7 @@
     async function loadPodcast(p) {
       const detail = document.getElementById('podcast-detail');
       detail.classList.add('show');
-      document.getElementById('pd-img').src = p.artworkUrl600;
+      document.getElementById('pd-img').src = p.artworkUrl600 || 'https://via.placeholder.com/600x600?text=Podcast';
       document.getElementById('pd-title').innerText = p.collectionName;
       document.getElementById('pd-author').innerText = p.artistName;
       document.getElementById('pd-desc').innerText = '';
@@ -375,21 +424,40 @@
           const enclosure = item.querySelector('enclosure');
           const url = enclosure?.getAttribute('url');
           if(!url) return;
-          const image = item.querySelector('itunes\\:image')?.getAttribute('href') || p.artworkUrl600;
+          const image = item.querySelector('itunes\\:image')?.getAttribute('href') || p.artworkUrl600 || 'https://via.placeholder.com/150';
           const date = new Date(item.querySelector('pubDate')?.textContent || Date.now()).toLocaleDateString();
-          const ep = { id: p.collectionId+'_'+i, title, podcast: p.collectionName, audioUrl: url, thumb: image, date };
+          const ep = { id: (p.collectionId || Date.now())+'_'+i, title, podcast: p.collectionName, audioUrl: url, thumb: image, date };
           S.eps.push(ep);
           
           epsEl.innerHTML += `
             <div class="list-item" onclick='playEp(${JSON.stringify(ep).replace(/'/g, "&apos;")})'>
-              <img src="${image}" style="width:50px;height:50px;border-radius:6px;">
+              <img src="${image}" style="width:50px;height:50px;border-radius:10px;">
               <div class="info">
-                <div class="title" style="font-size:14px;white-space:normal;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${title}</div>
+                <div class="title" style="font-size:15px;white-space:normal;line-height:1.2;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${title}</div>
                 <div class="sub">${date}</div>
               </div>
             </div>`;
         });
       } catch(e) { epsEl.innerHTML = '<div style="color:red">Failed to load feed</div>'; }
+    }
+    
+    function loadCustomRSS() {
+      const feed = prompt("Paste standard Podcast RSS link:");
+      if (!feed) return;
+      const fakePodcast = { collectionName: "Custom RSS", artistName: "Unknown", feedUrl: feed };
+      loadPodcast(fakePodcast);
+    }
+    
+    function playLiveRadio(name, url, img) {
+      const ep = {
+        id: 'radio_' + Date.now(),
+        title: 'Live Stream',
+        podcast: name,
+        audioUrl: url,
+        thumb: img || 'https://via.placeholder.com/150',
+        date: 'Live'
+      };
+      playEp(ep);
     }
     function closeDetails() { document.getElementById('podcast-detail').classList.remove('show'); }
 
